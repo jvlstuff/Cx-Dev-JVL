@@ -31,3 +31,4 @@ jobs:
           base_uri: https://prod1.ast-cloud.com
           client_id: ${{ secrets.CLIENT_ID }}
           secret: ${{ secrets.SECRET }}
+          project_name: Cx-Dev-JVL
