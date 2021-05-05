@@ -28,6 +28,6 @@ jobs:
       - name: Checkmarx AST CLI Action
         uses: checkmarxDev/ast-github-action@master #Github Action version
         with:
-          base_uri: ${{ secrets.AST_URI }}
+          base_uri: https://prod1.ast-cloud.com
           client_id: ${{ secrets.CLIENT_ID }}
           secret: ${{ secrets.SECRET }}
