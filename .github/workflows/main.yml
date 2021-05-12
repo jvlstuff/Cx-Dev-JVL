@@ -32,4 +32,5 @@ jobs:
           cx_client_id: ${{ secrets.CLIENT_ID }}
           cx_client_secret: ${{ secrets.SECRET }}
           project_name: Cx-Dev-JVL
-          scan_types: sast, kics, sca
+          scan_types: sast, kics
+          additional_params: --checkmarx.scan-preset="OWASP TOP 10 - 2017"
