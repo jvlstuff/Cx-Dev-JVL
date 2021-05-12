@@ -32,4 +32,4 @@ jobs:
           cx_client_id: ${{ secrets.CLIENT_ID }}
           cx_client_secret: ${{ secrets.SECRET }}
           project_name: Cx-Dev-JVL
-          scan_types: sast, kics
+          scan_types: sast, kics, sca
