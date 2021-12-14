@@ -56,14 +56,9 @@ jobs:
           cx_client_id: ${{ secrets.AST_CLIENT_ID }}
           cx_client_secret: ${{ secrets.AST_CLIENT_SECRET }}
           additional_params: --report-format sonar --scan-types sast
-     - name: Sonar CLI Action 
-       uses: SonarSource/sonarcloud-github-action@master
+          
+     - name: Analyze (sonar)
+       run: mvn sonarscanner  -Dsonar.externalIssuesReportPaths=cx_result_sonar.json -Dsonar.projectKey=jvlstuff_Cx-Dev-JVL
        env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
-       with:
-          args: >
-            -Dsonar.externalIssuesReportPaths=cx_result_sonar.json
-            -Dsonar.projectKey=covid-ch_CovidCertificate-Management-Service
-            -Dsonar.organization=covid-ch
-            
