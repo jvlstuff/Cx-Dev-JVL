@@ -58,7 +58,7 @@ jobs:
           additional_params: --report-format sonar --scan-types sast
           
      - name: Analyze (sonar)
-       run: mvn sonarscanner  -Dsonar.externalIssuesReportPaths=cx_result_sonar.json -Dsonar.projectKey=jvlstuff_Cx-Dev-JVL
+       run: mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar  -Dsonar.externalIssuesReportPaths=cx_result_sonar.json -Dsonar.projectKey=jvlstuff_Cx-Dev-JVL
        env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
