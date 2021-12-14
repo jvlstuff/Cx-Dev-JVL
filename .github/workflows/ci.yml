@@ -53,8 +53,8 @@ jobs:
           project_name: covid-ch/CovidCertificate-Management-Service
           base_uri: ${{ secrets.BASE_URI }}
           cx_tenant: ${{ secrets.TENANT }}
-          cx_client_id: ${{ secrets.CLIENT_ID }}
-          cx_client_secret: ${{ secrets.SECRET }}
+          cx_client_id: ${{ secrets.AST_CLIENT_ID }}
+          cx_client_secret: ${{ secrets.AST_CLIENT_SECRET }}
           additional_params: --report-format sonar 
      - name: Sonar CLI Action 
        uses: SonarSource/sonarcloud-github-action@master
