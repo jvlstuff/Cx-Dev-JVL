@@ -5,10 +5,10 @@ on:
     branches: [ master ]
 
 jobs:
-  Sonar:
+  Sonar_and_AST:
 
     runs-on: ubuntu-latest
-    if: ${{ false }}
+    if: ${{ true }}
 
     steps:
       - uses: actions/checkout@v2
@@ -34,16 +34,26 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
-
-
+      
+      - name: Checkmarx AST CLI Action
+        uses: Checkmarx/ast-github-action@master
+        with:
+          project_name: jvlstuff/Cx-Dev-JVL
+          base_uri: ${{ secrets.BASE_URI }}
+          cx_tenant: ${{ secrets.TENANT }}
+          cx_client_id: ${{ secrets.AST_CLIENT_ID }}
+          cx_client_secret: ${{ secrets.AST_CLIENT_SECRET }}
+          additional_params: --report-format sonar --scan-types sast
+          
       - name: Analyze (sonar)
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=covid-ch_CovidCertificate-Management-Service
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.externalIssuesReportPaths=cx_result_sonar.json -Dsonar.projectKey=jvlstuff_Cx-Dev-JVL
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ github.token }}
       
   Ast:
     runs-on: ubuntu-latest
+    if: ${{ false }}
     steps: 
      - name: Checkout
        uses: actions/checkout@v2
