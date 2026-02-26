@@ -18,7 +18,7 @@ jobs:
     - name: Install SBOMQS
       run: |
         VERSION=v2.0.4
-        curl -L -o sbomqs "https://github.com/interlynk-io/sbomqs/releases/download/v${VERSION}/sbomqs_${VERSION}_Linux_x86_64.tar.gz
+        curl -L https://github.com/interlynk-io/sbomqs/releases/download/v${VERSION}/sbomqs_${VERSION}_Linux_x86_64.tar.gz
         tar -xzvf sbomqs_${VERSION}_Linux_x86_64.tar.gz
         rm -rf sbomqs_${VERSION}_Linux_x86_64.tar.gz
         chmod +x sbomqs
