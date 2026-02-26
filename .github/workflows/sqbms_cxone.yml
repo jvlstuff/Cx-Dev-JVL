@@ -42,6 +42,7 @@ jobs:
         
     - name: Check SBOM Quality
       run: |
+        sbomqs score cx_result_sbom.json --json
         score=$(sbomqs score cx_result_sbom.json --json | jq '.files[0].sbom_quality_score')
         echo "SBOM Score: $score/10"
         
