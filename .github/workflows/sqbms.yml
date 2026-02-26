@@ -30,6 +30,8 @@ jobs:
         # Example using syft
         curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
         syft . -o spdx-json > sbom.json
+        ls -la
+        cat sbom.json || true
         
     - name: Check SBOM Quality
       run: |
