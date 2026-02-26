@@ -1,0 +1,69 @@
+name: SBOM Quality Check with CxONE
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+jobs:
+  sbom-quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install SBOMQS
+      run: |
+        VERSION=$(curl -s https://api.github.com/repos/interlynk-io/sbomqs/releases/latest | jq -r '.tag_name' | sed 's/v//')
+        wget https://github.com/interlynk-io/sbomqs/releases/download/v${VERSION}/sbomqs_${VERSION}_Linux_x86_64.tar.gz
+        tar -xzvf sbomqs_${VERSION}_Linux_x86_64.tar.gz
+        rm -rf sbomqs_${VERSION}_Linux_x86_64.tar.gz
+        chmod +x sbomqs
+        sudo mv sbomqs /usr/local/bin/
+        
+        
+   #- name: 
+   #   run: |
+   #     # Example using syft
+   #     curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+   #     syft . -o spdx-json > sbom.json
+
+    - name: Generate SBOM using CxONE
+      uses: checkmarx/ast-github-action@main
+      with:
+        base_uri: ${{ secrets.BASE_URI }}  # This should be replaced by your base uri for Checkmarx One
+        cx_client_id: ${{ secrets.AST_CLIENT_ID }} # This should be created within your Checkmarx One account : https://checkmarx.com/resource/documents/en/34965-118315-authentication-for-checkmarx-one-cli.html#UUID-a4e31a96-1f36-6293-e95a-97b4b9189060_UUID-4123a2ff-32d0-2287-8dd2-3c36947f675e
+        cx_client_secret: ${{ secrets.AST_CLIENT_SECRET }} # This should be created within your Checkmarx One account : https://checkmarx.com/resource/documents/en/34965-118315-authentication-for-checkmarx-one-cli.html#UUID-a4e31a96-1f36-6293-e95a-97b4b9189060_UUID-4123a2ff-32d0-2287-8dd2-3c36947f675e
+        cx_tenant: ${{ secrets.TENANT }} # This should be replaced by your tenant for Checkmarx One
+        additional_params:  --report-format sbom --report-sbom-format SpdxJson --output-path . --tags ${{ github.event.pull_request.head.sha }},${{ github.sha }},sbom_quality_check --scan-types sca
+        
+    - name: Check SBOM Quality
+      run: |
+        score=$(sbomqs score cx_result.json --json | jq '.files[0].sbom_quality_score')
+        echo "SBOM Score: $score/10"
+        
+        if (( $(echo "$score < 7.0" | bc -l) )); then
+          echo "::error::SBOM quality score too low: $score"
+          exit 1
+        fi
+        
+    - name: Check Compliance
+      run: |
+        sbomqs compliance --bsi-v2 sbom.json --json > compliance.json
+        
+        if [ $(jq '.summary.compliant' compliance.json) != "true" ]; then
+          echo "::error::SBOM is not BSI compliant"
+          jq '.recommendations[]' compliance.json
+          exit 1
+        fi
+        
+    - name: Upload Reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: sbom-reports
+        path: |
+          sbom.json
+          compliance.json
