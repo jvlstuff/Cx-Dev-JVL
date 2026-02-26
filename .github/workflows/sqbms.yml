@@ -36,7 +36,7 @@ jobs:
     - name: Check SBOM Quality
       run: |
         sbomqs score sbom.json --json
-        score=$(sbomqs score sbom.json --json | jq '.files[0].avg_score')
+        score=$(sbomqs score sbom.json --json | jq '.files[0].sbom_quality_score')
         echo "SBOM Score: $score/10"
         
         if (( $(echo "$score < 7.0" | bc -l) )); then
