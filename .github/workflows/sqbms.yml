@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [ main ]
 
+  workflow_dispatch:
+
 jobs:
   sbom-quality:
     runs-on: ubuntu-latest
