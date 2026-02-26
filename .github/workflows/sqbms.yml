@@ -1,0 +1,55 @@
+name: SBOM Quality Check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  sbom-quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install SBOMQS
+      run: |
+        VERSION=v2.0.4
+        curl -L -o sbomqs "https://github.com/interlynk-io/sbomqs/releases/download/${VERSION}/sbomqs-linux-amd64"
+        chmod +x sbomqs
+        sudo mv sbomqs /usr/local/bin/
+        
+    - name: Generate SBOM
+      run: |
+        # Example using syft
+        curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+        syft . -o spdx-json > sbom.json
+        
+    - name: Check SBOM Quality
+      run: |
+        score=$(sbomqs score sbom.json --json | jq '.files[0].avg_score')
+        echo "SBOM Score: $score/10"
+        
+        if (( $(echo "$score < 7.0" | bc -l) )); then
+          echo "::error::SBOM quality score too low: $score"
+          exit 1
+        fi
+        
+    - name: Check Compliance
+      run: |
+        sbomqs compliance --bsi-v2 sbom.json --json > compliance.json
+        
+        if [ $(jq '.summary.compliant' compliance.json) != "true" ]; then
+          echo "::error::SBOM is not BSI compliant"
+          jq '.recommendations[]' compliance.json
+          exit 1
+        fi
+        
+    - name: Upload Reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: sbom-reports
+        path: |
+          sbom.json
+          compliance.json
