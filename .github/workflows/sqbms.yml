@@ -23,15 +23,13 @@ jobs:
         rm -rf sbomqs_${VERSION}_Linux_x86_64.tar.gz
         chmod +x sbomqs
         sudo mv sbomqs /usr/local/bin/
-        sbomqs version
+        
         
     - name: Generate SBOM
       run: |
         # Example using syft
         curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
         syft . -o spdx-json > sbom.json
-        ls -la
-        cat sbom.json || true
         
     - name: Check SBOM Quality
       run: |
