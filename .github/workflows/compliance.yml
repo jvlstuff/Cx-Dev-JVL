@@ -28,9 +28,8 @@ jobs:
     - name: Get SBOM
       run: |
         # Example using syft
-        wget https://github.com/interlynk-io/sbomqs/blob/main/testdata/fixtures/spdx-perfect-score.json
+        wget -O sbom.json https://github.com/interlynk-io/sbomqs/blob/main/testdata/fixtures/spdx-perfect-score.json
         ls -al
-        mv spdx-perfect-score.json sbom.json
         
     - name: Check SBOM Quality
       run: |
